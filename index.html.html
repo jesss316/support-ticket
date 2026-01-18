@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8" />
+  <title>客服問題回報</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <style>
+    body {
+      font-family: system-ui, -apple-system, BlinkMacSystemFont;
+      background: #f6f7f9;
+      padding: 30px;
+    }
+    .container {
+      max-width: 520px;
+      margin: auto;
+      background: #fff;
+      padding: 24px;
+      border-radius: 8px;
+      box-shadow: 0 10px 25px rgba(0,0,0,.08);
+    }
+    h2 {
+      margin-bottom: 16px;
+    }
+    label {
+      display: block;
+      margin-top: 14px;
+      font-weight: 600;
+    }
+    input, textarea, select, button {
+      width: 100%;
+      margin-top: 6px;
+      padding: 10px;
+      font-size: 14px;
+    }
+    textarea {
+      resize: vertical;
+      min-height: 90px;
+    }
+    button {
+      margin-top: 20px;
+      background: #2563eb;
+      color: white;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+    }
+    button:hover {
+      background: #1e4fd8;
+    }
+    .result {
+      margin-top: 20px;
+      padding: 12px;
+      background: #eef2ff;
+      border-radius: 6px;
+      display: none;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="container">
+    <h2>客服問題回報</h2>
+
+    <form id="ticketForm">
+      <label>問題描述 *</label>
+      <textarea name="issueDesc" required></textarea>
+
+      <label>姓名 *</label>
+      <input type="text" name="customerName" required />
+
+      <label>公司</label>
+      <input type="text" name="company" />
+
+      <label>Email *</label>
+      <input type="email" name="email" required />
+
+      <label>作業系統</label>
+      <input type="text" name="os" placeholder="例如 Windows 11" />
+
+      <label>設備</label>
+      <input type="text" name="device" placeholder="例如 NVMe SSD" />
+
+      <button type="submit">送出問題</button>
+    </form>
+
+    <div class="result" id="resultBox"></div>
+  </div>
+
+  <script>
+    const form = document.getElementById("ticketForm");
+    const resultBox = document.getElementById("resultBox");
+
+    form.addEventListener("submit", async (e) => {
+      e.preventDefault();
+
+      const data = Object.fromEntries(new FormData(form));
+      data.createdAt = new Date().toISOString();
+
+      try {
+        const res = await fetch(
+          "https://Jess20020316-n8n-free.hf.space/webhook/support-ticket",
+          {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(data)
+          }
+        );
+
+        const result = await res.json();
+
+        resultBox.style.display = "block";
+        resultBox.innerHTML = `
+          <strong>送出成功 ✅</strong><br>
+          您的 Ticket ID：<br>
+          <code>${result.ticketId}</code>
+        `;
+
+        form.reset();
+      } catch (err) {
+        alert("送出失敗，請稍後再試");
+      }
+    });
+  </script>
+</body>
+</html>
