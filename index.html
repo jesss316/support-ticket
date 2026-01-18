@@ -1,126 +1,443 @@
-<!DOCTYPE html>
-<html lang="zh-TW">
+<!doctype html>
+<html lang="zh-Hant">
 <head>
-  <meta charset="UTF-8" />
-  <title>客服問題回報</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>客戶技術支援工單｜提交</title>
+  <meta name="description" content="客戶技術支援工單提交頁面，送出後即時取得 Ticket ID。" />
   <style>
-    body {
-      font-family: system-ui, -apple-system, BlinkMacSystemFont;
-      background: #f6f7f9;
-      padding: 30px;
+    :root{
+      --bg: #0b1220;
+      --card: rgba(255,255,255,0.08);
+      --card2: rgba(255,255,255,0.10);
+      --text: rgba(255,255,255,0.92);
+      --muted: rgba(255,255,255,0.65);
+      --line: rgba(255,255,255,0.14);
+      --primary: #4f7cff;
+      --primary2: #2f5bff;
+      --okbg: rgba(36, 220, 155, 0.10);
+      --okline: rgba(36, 220, 155, 0.40);
+      --errbg: rgba(255, 77, 109, 0.10);
+      --errline: rgba(255, 77, 109, 0.40);
+      --radius: 18px;
     }
-    .container {
-      max-width: 520px;
-      margin: auto;
-      background: #fff;
-      padding: 24px;
-      border-radius: 8px;
-      box-shadow: 0 10px 25px rgba(0,0,0,.08);
+
+    *{ box-sizing:border-box; }
+    body{
+      margin:0;
+      font-family: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Arial;
+      color: var(--text);
+      background:
+        radial-gradient(900px 600px at 20% -10%, rgba(79,124,255,0.35), transparent 55%),
+        radial-gradient(800px 500px at 95% 10%, rgba(36,220,155,0.25), transparent 55%),
+        radial-gradient(900px 700px at 40% 120%, rgba(255,77,109,0.18), transparent 55%),
+        var(--bg);
+      min-height: 100vh;
+      padding: 32px 14px;
     }
-    h2 {
-      margin-bottom: 16px;
+
+    .wrap{ max-width: 960px; margin: 0 auto; }
+
+    header{
+      display:flex;
+      align-items:flex-start;
+      justify-content:space-between;
+      gap: 16px;
+      margin-bottom: 18px;
     }
-    label {
-      display: block;
-      margin-top: 14px;
-      font-weight: 600;
+    .title h1{
+      margin:0;
+      font-size: 22px;
+      letter-spacing: .2px;
     }
-    input, textarea, select, button {
-      width: 100%;
-      margin-top: 6px;
-      padding: 10px;
+    .title p{
+      margin: 8px 0 0;
+      color: var(--muted);
+      line-height: 1.5;
       font-size: 14px;
     }
-    textarea {
-      resize: vertical;
-      min-height: 90px;
+
+    .badge{
+      padding: 10px 12px;
+      border: 1px solid var(--line);
+      background: rgba(255,255,255,0.06);
+      border-radius: 999px;
+      color: var(--muted);
+      font-size: 12px;
+      white-space: nowrap;
+      user-select:none;
     }
-    button {
-      margin-top: 20px;
-      background: #2563eb;
+
+    .grid{
+      display:grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 14px;
+    }
+
+    .card{
+      background: linear-gradient(180deg, var(--card2), var(--card));
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      padding: 18px;
+      box-shadow: 0 18px 50px rgba(0,0,0,0.35);
+      backdrop-filter: blur(8px);
+    }
+
+    .card h2{
+      margin: 0 0 12px;
+      font-size: 16px;
+      letter-spacing: .2px;
+    }
+
+    .field{ margin-top: 12px; }
+    .field label{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap: 10px;
+      font-size: 13px;
+      color: var(--muted);
+      margin-bottom: 6px;
+    }
+    .req{
+      font-size: 11px;
+      padding: 3px 8px;
+      border-radius: 999px;
+      border: 1px solid var(--line);
+      color: var(--muted);
+      background: rgba(255,255,255,0.06);
+    }
+
+    input, select, textarea{
+      width:100%;
+      border: 1px solid rgba(255,255,255,0.18);
+      background: rgba(0,0,0,0.18);
+      color: var(--text);
+      border-radius: 12px;
+      padding: 11px 12px;
+      outline: none;
+      font-size: 14px;
+    }
+    input::placeholder, textarea::placeholder{
+      color: rgba(255,255,255,0.40);
+    }
+    textarea{ min-height: 120px; resize: vertical; }
+
+    input:focus, select:focus, textarea:focus{
+      border-color: rgba(79,124,255,0.65);
+      box-shadow: 0 0 0 4px rgba(79,124,255,0.18);
+    }
+
+    .row{ grid-column: 1 / -1; }
+
+    .actions{
+      display:flex;
+      gap: 10px;
+      align-items:center;
+      justify-content:flex-end;
+      margin-top: 14px;
+      flex-wrap: wrap;
+    }
+
+    .btn{
+      border: 0;
+      border-radius: 12px;
+      padding: 12px 14px;
+      cursor:pointer;
+      font-size: 14px;
+      font-weight: 600;
+      transition: transform .05s ease, opacity .15s ease;
+      user-select:none;
+    }
+    .btn:active{ transform: translateY(1px); }
+
+    .btn-primary{
+      background: linear-gradient(135deg, var(--primary), var(--primary2));
       color: white;
-      border: none;
-      border-radius: 6px;
-      cursor: pointer;
+      min-width: 160px;
     }
-    button:hover {
-      background: #1e4fd8;
+    .btn-ghost{
+      background: rgba(255,255,255,0.06);
+      border: 1px solid var(--line);
+      color: var(--text);
     }
-    .result {
-      margin-top: 20px;
-      padding: 12px;
-      background: #eef2ff;
-      border-radius: 6px;
-      display: none;
+    .btn[disabled]{
+      opacity: .55;
+      cursor: not-allowed;
+    }
+
+    .note{
+      color: var(--muted);
+      font-size: 12px;
+      line-height: 1.45;
+      margin-top: 10px;
+    }
+
+    .alert{
+      display:none;
+      margin-top: 14px;
+      padding: 12px 12px;
+      border-radius: 14px;
+      border: 1px solid var(--line);
+      background: rgba(255,255,255,0.06);
+      line-height: 1.55;
+      font-size: 13px;
+    }
+    .alert.ok{
+      background: var(--okbg);
+      border-color: var(--okline);
+    }
+    .alert.err{
+      background: var(--errbg);
+      border-color: var(--errline);
+    }
+    .ticket{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap: 10px;
+      margin-top: 8px;
+      padding: 10px 12px;
+      background: rgba(0,0,0,0.16);
+      border: 1px solid rgba(255,255,255,0.14);
+      border-radius: 12px;
+      font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+      font-size: 13px;
+    }
+    .copy{
+      padding: 8px 10px;
+      border-radius: 10px;
+      border: 1px solid var(--line);
+      background: rgba(255,255,255,0.06);
+      color: var(--text);
+      cursor:pointer;
+      font-size: 12px;
+      white-space: nowrap;
+    }
+
+    footer{
+      margin-top: 14px;
+      color: rgba(255,255,255,0.45);
+      font-size: 12px;
+      text-align:center;
+    }
+
+    @media (max-width: 820px){
+      header{ flex-direction: column; }
+      .grid{ grid-template-columns: 1fr; }
+      .actions{ justify-content: stretch; }
+      .btn-primary{ width: 100%; }
+      .btn-ghost{ width: 100%; }
     }
   </style>
 </head>
 
 <body>
-  <div class="container">
-    <h2>客服問題回報</h2>
+  <div class="wrap">
+    <header>
+      <div class="title">
+        <h1>客戶技術支援工單管理與自動回饋系統</h1>
+        <p>
+          請填寫以下資訊提交工單。送出後將即時取得 <b>Ticket ID</b> 以利追蹤。<br/>
+          （資料將記錄至 Google Sheets，並由後端自動產生 Ticket ID 與建立時間）
+        </p>
+      </div>
+      <div class="badge">Powered by n8n + Google Sheets</div>
+    </header>
 
-    <form id="ticketForm">
-      <label>問題描述 *</label>
-      <textarea name="issueDesc" required></textarea>
+    <div class="grid">
+      <div class="card row">
+        <h2>工單內容</h2>
 
-      <label>姓名 *</label>
-      <input type="text" name="customerName" required />
+        <form id="form" autocomplete="on">
+          <div class="field">
+            <label for="issueDesc">
+              問題描述（issueDesc）
+              <span class="req">必填</span>
+            </label>
+            <textarea id="issueDesc" required placeholder="請描述問題發生情境、錯誤訊息、是否可重現、發生頻率等…"></textarea>
+          </div>
 
-      <label>公司</label>
-      <input type="text" name="company" />
+          <div class="grid" style="margin-top: 6px;">
+            <div class="field">
+              <label for="customerName">
+                客戶姓名（customerName）
+                <span class="req">必填</span>
+              </label>
+              <input id="customerName" required placeholder="例如：王志明" />
+            </div>
 
-      <label>Email *</label>
-      <input type="email" name="email" required />
+            <div class="field">
+              <label for="company">公司（company）</label>
+              <input id="company" placeholder="例如：ABC Tech" />
+            </div>
 
-      <label>作業系統</label>
-      <input type="text" name="os" placeholder="例如 Windows 11" />
+            <div class="field">
+              <label for="email">
+                Email（email）
+                <span class="req">必填</span>
+              </label>
+              <input id="email" type="email" required placeholder="name@example.com" />
+            </div>
 
-      <label>設備</label>
-      <input type="text" name="device" placeholder="例如 NVMe SSD" />
+            <div class="field">
+              <label for="os">作業系統（os）</label>
+              <input id="os" placeholder="例如：Windows 11 Pro 23H2" />
+            </div>
 
-      <button type="submit">送出問題</button>
-    </form>
+            <div class="field row">
+              <label for="device">設備（device）</label>
+              <input id="device" placeholder="例如：Dell XPS / Samsung 990 PRO NVMe SSD" />
+            </div>
+          </div>
 
-    <div class="result" id="resultBox"></div>
+          <div class="actions">
+            <button class="btn btn-ghost" type="button" id="btnFill">填入示例</button>
+            <button class="btn btn-ghost" type="button" id="btnReset">清除</button>
+            <button class="btn btn-primary" type="submit" id="btnSubmit">送出工單</button>
+          </div>
+
+          <div class="note">
+            送出後若未顯示 Ticket ID，請確認網路狀態或稍後再試。若問題緊急，建議附上可重現步驟或錯誤截圖。
+          </div>
+
+          <div class="alert ok" id="okBox">
+            ✅ 已成功送出工單！
+            <div class="ticket">
+              <span id="ticketText">TK-xxxxxxxxxxxxxx</span>
+              <button class="copy" type="button" id="btnCopy">複製 Ticket ID</button>
+            </div>
+          </div>
+
+          <div class="alert err" id="errBox">
+            ❌ 送出失敗：<span id="errText">請稍後再試</span>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <footer>© 2026 作品集展示｜自動化流程示範</footer>
   </div>
 
-  <script>
-    const form = document.getElementById("ticketForm");
-    const resultBox = document.getElementById("resultBox");
+<script>
+  const WEBHOOK_URL = "https://Jess20020316-n8n-free.hf.space/webhook/support-ticket";
 
-    form.addEventListener("submit", async (e) => {
-      e.preventDefault();
+  const $ = (id) => document.getElementById(id);
 
-      const data = Object.fromEntries(new FormData(form));
-      data.createdAt = new Date().toISOString();
+  const form = $("form");
+  const issueDesc = $("issueDesc");
+  const customerName = $("customerName");
+  const company = $("company");
+  const email = $("email");
+  const os = $("os");
+  const device = $("device");
 
-      try {
-        const res = await fetch(
-          "https://Jess20020316-n8n-free.hf.space/webhook/support-ticket",
-          {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify(data)
-          }
-        );
+  const btnSubmit = $("btnSubmit");
+  const btnFill = $("btnFill");
+  const btnReset = $("btnReset");
 
-        const result = await res.json();
+  const okBox = $("okBox");
+  const errBox = $("errBox");
+  const ticketText = $("ticketText");
+  const errText = $("errText");
+  const btnCopy = $("btnCopy");
 
-        resultBox.style.display = "block";
-        resultBox.innerHTML = `
-          <strong>送出成功 ✅</strong><br>
-          您的 Ticket ID：<br>
-          <code>${result.ticketId}</code>
-        `;
+  function setLoading(isLoading){
+    btnSubmit.disabled = isLoading;
+    btnFill.disabled = isLoading;
+    btnReset.disabled = isLoading;
+    btnSubmit.textContent = isLoading ? "送出中…" : "送出工單";
+  }
 
-        form.reset();
-      } catch (err) {
-        alert("送出失敗，請稍後再試");
+  function showOK(ticketId){
+    errBox.style.display = "none";
+    okBox.style.display = "block";
+    ticketText.textContent = ticketId || "(未回傳 Ticket ID)";
+  }
+
+  function showErr(message){
+    okBox.style.display = "none";
+    errBox.style.display = "block";
+    errText.textContent = message || "請稍後再試";
+  }
+
+  btnFill.addEventListener("click", () => {
+    issueDesc.value = "電腦從睡眠模式喚醒後，NVMe SSD 偶爾消失，系統顯示找不到磁碟；需重新開機才能恢復。Windows 更新後發生頻率提高。";
+    customerName.value = "王志明";
+    company.value = "ABC Tech";
+    email.value = "jim.wang@abctech.com";
+    os.value = "Windows 11 Pro 23H2";
+    device.value = "Dell Precision 5570 / Samsung 990 PRO NVMe SSD";
+  });
+
+  btnReset.addEventListener("click", () => {
+    okBox.style.display = "none";
+    errBox.style.display = "none";
+    form.reset();
+  });
+
+  btnCopy.addEventListener("click", async () => {
+    try {
+      await navigator.clipboard.writeText(ticketText.textContent);
+      btnCopy.textContent = "已複製";
+      setTimeout(() => btnCopy.textContent = "複製 Ticket ID", 900);
+    } catch {
+      btnCopy.textContent = "無法複製";
+      setTimeout(() => btnCopy.textContent = "複製 Ticket ID", 900);
+    }
+  });
+
+  form.addEventListener("submit", async (e) => {
+    e.preventDefault();
+
+    okBox.style.display = "none";
+    errBox.style.display = "none";
+
+    const payload = {
+      issueDesc: issueDesc.value.trim(),
+      customerName: customerName.value.trim(),
+      company: company.value.trim(),
+      email: email.value.trim(),
+      os: os.value.trim(),
+      device: device.value.trim(),
+      createdAt: new Date().toISOString()
+    };
+
+    if (!payload.issueDesc || !payload.customerName || !payload.email){
+      showErr("請填寫必填欄位（問題描述、姓名、Email）。");
+      return;
+    }
+
+    setLoading(true);
+
+    try {
+      const res = await fetch(WEBHOOK_URL, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload)
+      });
+
+      if (!res.ok) {
+        const txt = await res.text().catch(() => "");
+        throw new Error(`HTTP ${res.status} ${txt}`.trim());
       }
-    });
-  </script>
+
+      const data = await res.json().catch(() => ({}));
+
+      // 你 n8n 現在回的是 { ticketId: "TK-..." }
+      if (!data.ticketId) {
+        throw new Error("未取得 ticketId（請確認 n8n Respond to Webhook 回傳格式）");
+      }
+
+      showOK(data.ticketId);
+      form.reset();
+    } catch (err) {
+      showErr(err?.message || "請稍後再試");
+    } finally {
+      setLoading(false);
+    }
+  });
+</script>
 </body>
 </html>
+
